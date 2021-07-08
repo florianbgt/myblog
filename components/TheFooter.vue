@@ -15,13 +15,13 @@
                     </a>
                 </b-col>
                 <b-col sm=2 class="mb-2">
-                    <a href="https://linkedin.com/in/florianbgt" target="_blank" class="text-light">
+                    <a href="https://linkedin.com/in/florianbgt" target="_blank" rel="noopener" class="text-light">
                         <fa :icon="['fab', 'linkedin']" style="font-size: 30px"/>
                         <span>Linkedin</span>
                     </a>  
                 </b-col>
                 <b-col sm=2 class="mb-2">
-                    <a href="https://github.com/florianbgt" target="_blank" class="text-light">
+                    <a href="https://github.com/florianbgt" target="_blank" rel="noopener" class="text-light">
                         <fa :icon="['fab', 'github']" style="font-size: 30px"/>
                         <span>Github</span>
                     </a>

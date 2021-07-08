@@ -1,6 +1,6 @@
 <template>
     <b-container fluid>
-        <b-container class="my-5">
+        <b-container class="py-5">
             <blog-img v-if="'image' in article" :src="article.image" alt="Head image" style="width: 100%; height: 250px; object-fit: cover"/>
             <img v-else :src="require('~/content/default.png')" style="width: 100%; height: 250px; object-fit: cover"/>
             <h1 class="mt-4">{{article.title}}</h1>
