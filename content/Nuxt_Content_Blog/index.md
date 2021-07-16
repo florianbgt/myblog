@@ -158,7 +158,7 @@ That is it, Nuxt content is not ready to be used!
 
 We next build our /blog page. This page will use our markdown files as content because it is super efficient to write with and easy to learn!
 
-We need to put our markdown files inside a "content" folder at the root of our project. Let's create 2 dummy files:
+We need to put our markdown files inside a `content` folder at the root of our project. Let's create 2 dummy files:
 ```bash
 mkdir content
 mkdir content/blog
@@ -276,7 +276,7 @@ image: 'index.png'      #new
 ---
 ```
 
-We also include a default image in case some article does not have a specific image to be displayed (like our dummy Article 2). We will name it default.png and place it in the content/blog directory.
+We also include a default image in case some articles do not have a specific image to be displayed (like our dummy Article 2). We will name it default.png and place it in the content/blog directory.
 
 We now modify our blog page to display these images:
 ```vue
@@ -400,7 +400,7 @@ Content of Article 1
 
 ## Conclusion
 
-We now have a our blog app setup! We just have to create article in the content folder and all our routes will automatically be generated.
+We now have a our blog app setup! We just have to create articles in the content folder and all our routes will automatically be generated.
 
 For deployment, just run the following command and you will end up with a static website ready to be published!
 ```bash

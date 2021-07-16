@@ -3,10 +3,10 @@
         <b-container class="py-5">
             <h1>Welcome to my <span class="text-secondary">Tech Blog!</span></h1>
             <div>
-                <p>I am writting tutorials here on my free time about the techs I use on my work</p>
+                <p>I am writting tutorials here on my free time about the techs I like to use</p>
                 <p>Feel free to email me if you wanna chat about my content &#128512;</p>
                 <p>
-                    You can find all the content off this blog (and more!) and my github:
+                    You can find all the content off this blog (and more!) on my github:
                     <a href="https://github.com/florianbgt" target="_blank" rel="noopener">https://github.com/florianbgt</a>
                 </p>
                 <p>
