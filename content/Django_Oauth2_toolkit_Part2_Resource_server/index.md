@@ -9,9 +9,9 @@ In this article, we will setup an Oauth2 authenticartion server with Django.
 
 This server will be a REST API usable by other services for authentication using email and password.
 
-This is the part 2 of the tutorial where we will setup the authentication server
+This is the part 2 of the tutorial where we will setup the resource server
 
-Part 2 here: https://blog.florianbgt.com/Django_Oauth2_toolkit_Part1_Auth_server
+Part 1 here: https://blog.florianbgt.com/Django_Oauth2_toolkit_Part1_Auth_server
 
 You can find the source code on my github: https://github.com/florianbgt/django-rest-oauth2-resourceserver
 
@@ -27,7 +27,7 @@ Here is the code below:
 mkdir Django-rest-oauth2-resource-server
 cd Django-rest-oauth2-resource-server
 python -m venv env
-### if you arer using Windows
+### if you are using Windows
 env\scripts\activate
 ### if you are using Mac or Linux
 source env/bin/activate
@@ -181,17 +181,17 @@ Password (again): testpass123
 
 ## 2) Setting up Oauth2 using Django Oauth Toolkit
 
-The setup is going to be similar to the [Part1](https://blog.florianbgt.com/Django_Oauth2_toolkit_Part1_Auth_server) of this article.
+The setup is going to be similar to the authentication server ([Part1](https://blog.florianbgt.com/Django_Oauth2_toolkit_Part1_Auth_server) of this article).
 
 ```bash
 pip install djangorestframework django-oauth-toolkit
 ```
 
-The only difference are the introspection settings (`RESOURCE_SERVER_INTROSPECTION_URL` and `RESOURCE_SERVER_INTROSPECTION_CREDENTIALS`). These 2 settings will allow our resource server to communicate with our authorisation server to get information about our users
+The only difference are the introspection settings (`RESOURCE_SERVER_INTROSPECTION_URL` and `RESOURCE_SERVER_INTROSPECTION_CREDENTIALS`). These 2 settings will allow our resource server to communicate with our authorization server to get information about our users
 
 In `RESOURCE_SERVER_INTROSPECTION_CREDENTIALS`, you need to put the client Id and client Secret we created in the Part1 of this article
 
-Because of this communication between our 2 server, we do not need to add Oauth Toolkit in our `_project/urls.py`
+Because of this communication between our 2 server, we do not need (or want in this example) to add Oauth Toolkit in our `_project/urls.py`
 
 ```python
 ### _projects/settings.py
@@ -237,7 +237,7 @@ REST_FRAMEWORK = {      #new
 
 In this section, we will setup views to allow new user to signup, login and change their password.
 
-The idea here is not to have the user directly interact with our authentication server. We will for that setup API view that will forward the request from the user, to the resource server to the authentication server:
+The idea here is not to have the user directly interact with our authentication server. We will for that setup API view that will forward the request from the resource server to the authentication server:
 
 ```bash
 touch users/serializers.py
@@ -274,7 +274,7 @@ class PasswordChangeSerializer(serializers.Serializer):      #new
 Then, we setup our views:
 - For the signup view, we send a http request to our authentication server with the new user information. We then forward back the response from the authentication server to the user
 - We do the same thing for the login view (GetTokenView) and refresh view (RefreshTokenView). That also allow us to keep the client id and client secret we created in the Part 1 of this article secret!
-- Same thing in the password change view. But here, we also pass the authaurisation header to the authentication server. That will allow the authentication server to identify the user
+- Same thing in the password change view. But here, we also pass the authorization header to the authentication server. That will allow the authentication server to identify the user
 
 ```python
 ### users/views.py
@@ -385,7 +385,7 @@ python manage.py runserver localhost:8000       ### auth server
 python manage.py runserver localhost:8001       ### resource server
 ```
 
-Let's now create a new user from our resource serverusing the following http request with postman:
+Let's now create a new user from our resource server using the following http request with postman:
 
 <div><blog-img src="postman_signup.png" alt="Postman http request to signup a new user" width="100%" height="auto" class="shadow mb-3"/></div>
 
@@ -399,7 +399,7 @@ We finally change the user's password from the resource as well using this http 
 
 In the background, our resource server will check in its database if a user exist and a valid access token exists:
 - If it does, the user will be granted access
-- If it does not, the resource server will check if the user exists and if a valid access token exists in the authorization server. If it does, user will be granted access
+- If it does not, the resource server will check if the user exists and if a valid access token exists in the authentication server. If it does, user will be granted access
 - If none of the 2 conditions above are met, the user will be denied access
 
 Some time has passed and our access token has expired. We can also renew it using this http request:
