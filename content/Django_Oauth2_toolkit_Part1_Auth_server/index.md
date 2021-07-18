@@ -40,11 +40,7 @@ django-admin startproject _project .
 
 We now implement user authentication using email. First, we create an app `users` and a few files:
 
-```bash
-python manage.py startapp users
-touch users/managers.py
-touch users/forms.py
-```
+c
 
 The first thing we are going to modify is Django user manager. This is where we tell Django how to create users. We do so by extending `BaseUserManager`:
 
@@ -361,7 +357,7 @@ We then create the views:
 ```python
 ### users/views.py
 from rest_framework import generics     #new
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny     #new
 from django.contrib.auth import get_user_model     #new
 from .serializers import SignUpSerializer, PasswordChangeSerializer     #new
 
@@ -418,7 +414,7 @@ We also now get a token with that new user:
 
 <div><blog-img src="postman_get_token_user1.png" alt="Postman http request to get token for new user" width="100%" height="auto" class="shadow mb-3"/></div>
 
-Finally, we can change the password of this new user:
+Finally, we can change the password of this new user. Here, we need to attached the access token in a authorization header (type Bearer):
 
 <div><blog-img src="postman_change_password.png" alt="Postman http request to change password for new user" width="100%" height="auto" class="shadow mb-3"/></div>
 
