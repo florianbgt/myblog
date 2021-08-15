@@ -25,7 +25,7 @@ First, we create our virtualenvironement:
 mkdir Django-rest-oauth2-auth-server
 cd Django-rest-oauth2-auth-server
 python -m venv env
-### if you arer using Windows
+### if you are using Windows
 env\scripts\activate
 ### if you are using Mac or Linux
 source env/bin/activate
