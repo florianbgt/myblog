@@ -40,7 +40,9 @@ django-admin startproject _project .
 
 We now implement user authentication using email. First, we create an app `users` and a few files:
 
-c
+```bash
+python manage.py startapp users
+```
 
 The first thing we are going to modify is Django user manager. This is where we tell Django how to create users. We do so by extending `BaseUserManager`:
 
