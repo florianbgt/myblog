@@ -100,10 +100,10 @@ POSTGRES_HOST=db
 POSTGRES_PORT=5432
 
 EMAIL_HOST=smtp.gmail.com
-EMAIL_HOST_USER=florian.bigot321@gmail.com
-EMAIL_HOST_PASSWORD=jlycddpgxhquttxc
-EMAIL_PORT=587
-DEFAULT_FROM_EMAIL=florian.bigot321@gmail.com
+EMAIL_HOST_USER=<your email>
+EMAIL_HOST_PASSWORD=<your email>
+EMAIL_PORT=<port>
+DEFAULT_FROM_EMAIL=<your email>
 
 HOST=0.0.0.0
 ```
@@ -442,10 +442,10 @@ POSTGRES_HOST=db
 POSTGRES_PORT=5432
 
 EMAIL_HOST=smtp.gmail.com
-EMAIL_HOST_USER=florian.bigot321@gmail.com
-EMAIL_HOST_PASSWORD=jlycddpgxhquttxc
-EMAIL_PORT=587
-DEFAULT_FROM_EMAIL=florian.bigot321@gmail.com
+EMAIL_HOST_USER=<your email>
+EMAIL_HOST_PASSWORD=<your password>
+EMAIL_PORT=<port>
+DEFAULT_FROM_EMAIL=<your email>
 FRONTEND_URL=http://localhost:3000
 
 HOST=0.0.0.0
