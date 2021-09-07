@@ -1,40 +1,43 @@
 ---
-title: Production ready Universal PWA with SSR using Nuxt, Django, Docker and AWS (Part 1)
-description: Create an universal PWA with SSR and deploy it on AWS usign Nuxt, Django and Docker. Part 1, Django API
+title: Nuxt Django app - Part 1
+description: Create a dockerized Nuxt app with PWA and SSR support using a python REST API built with Django. Part 1, create the REST API
+image: "nuxt-python.png"
 writtenBy: "Florian Bigot"
 ---
 
-In this article, we will setup a production ready universal PWA using Nuxt, Django, Docker and AWS.
+In this tutorial, we will setup a dockerized Nuxt app with PWA and SSR capabilities. This app will consume a python REST API built with Django.
 
-This is the part 1 of the tutorial where we will setup the REST API using Django.
+This is the part 1 of the tutorial where we will setup the python REST API
 
-Part 2 here: https://blog.florianbgt.com/http://localhost:3000/Universal_PWA_SSR_Nuxt_Django_docker_AWS_Part2_Nuxt_Frontend
+[Part 2 here](https://blog.florianbgt.com/Nuxt_Django_REST_Docker_Part2)
 
-Part 3 here: https://blog.florianbgt.com/http://localhost:3000/Universal_PWA_SSR_Nuxt_Django_docker_AWS_Part3_AWS_Deployment
-
-You can find the source code on my github: https://github.com/florianbgt/Universal_PWA_SSR_Nuxt_Django_Docker_AWS
+You can find the source code of this article on [my github](https://github.com/florianbgt/Nuxt-Django-REST-Docker)
 
 ## 1) Setting up our project
 
-To setup our project, we will use Docker. So the only dependency needed id docker itself!
+To setup our project, we will use Docker. So the only dependency needed is docker itself!
 
-If you do not have Docker installed on your machine, you can get it here https://docs.docker.com/get-docker/.
+If you do not have Docker installed on your machine, you can get it [here](https://docs.docker.com/get-docker/).
 
-let's start by creating the following files:
+let's start by creating our api directory and the following files:
 
 ```bash
 mkdir api
 touch api/requirements.txt
 touch api/Dockerfile
 touch docker-compose.yml
-touch .env
 ```
+
+`requirements.txt` will be use by docker to install the dependency we need.
 
 ```python
 ### api/requirements.txt
 Django==3.2
 psycopg2-binary==2.9.1
+djangorestframework==3.12.2
 ```
+
+`Dockerfile` will be use by docker to build the image which our API will run in.
 
 ```yaml
 ### api/Dockerfile
@@ -47,17 +50,24 @@ RUN pip install -r requirements.txt
 COPY . .
 ```
 
+`docker-compose.yml` will be use during our developement to orchestrate our containers.
+For now, we are going to use 2 containers:
+- A postgreSQL database (official image from Docker hub)
+- Our custom API image
+
 ```yaml
 ### docker-compose.yml
 version: "3.9"
 
 services:
   db:
-    image: postgres
+    image: postgres:13.4
     volumes:
       - ./db:/var/lib/postgresql/data
-    env_file:
-      - .env
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
   api:
     restart: always
     build:
@@ -70,44 +80,33 @@ services:
       - "8000:8000"
     depends_on:
       - db
-    env_file:
-      - .env
 ```
 
-```txt
-### .env
-POSTGRES_DB=postgres
-POSTGRES_USER=postgres
-POSTGRES_PASSWORD=postgres
-POSTGRES_HOST=db
-POSTGRES_PORT=5432
-```
-
-Then we run the following command to build our images and create our Django project.
+Using these files and Docker, we simply run the following command to create our Django project
 
 ```bash
 docker-compose run api django-admin startproject _project .
 ```
 
-We now now have your `api` image built and your django project setup thanks to the volume we defined!
+Our project is now setup! We should now have Django files creaated inside the `api` directory thanks to the bind mount we defined in the `docker-compose.yml` file.
 
-We can run our services in Docker using the following command.
+We can make sure our API is working well by spinning up our container using the following command.
 
 ```bash
 docker-compose up
 ```
 
-If we go to http://localhost:8000/, we should see our `api` up and running:
+If we go to http://localhost:8000/, we should see our Django app up and running:
 
 <div><blog-img src="django_success.png" alt="Django landing page" width="100%" height="auto" class="shadow mb-3"/></div>
 
-Currently, our app is using the default `sqlite` database.
-
-Will use a postgrSQL database even during production to mimic our production environement as much as possible.
+Currently, our app is using the default `sqlite` database Django provides. We could use this database for developement. However, I like to use a postgreSQL database during developement to mimic our production environement as much as possible and avoid potential headache later on.
 
 Thanksfully, the official `postgresql` docker image make things extrimely easy for us!
 
-We only need to modify our `settings.py` like below.
+A `db` directory should also have been created. This is the files used by the postgres official image that run our postgreSQL database.
+
+We only need to modify our `settings.py` like below to connect to the dockerized postgreSQL database.
 
 ```python
 ### api/_project/settings.py
@@ -117,43 +116,36 @@ impost os
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get("POSTGRES_DB"),
-        'USER': os.environ.get("POSTGRES_USER"),
-        'PASSWORD': os.environ.get("POSTGRES_PASSWORD"),
-        'HOST': os.environ.get("POSTGRES_HOST"),
-        'PORT': os.environ.get("POSTGRES_PORT"),
+        'NAME': 'postgres',
+        'USER': 'postgres',
+        'PASSWORD': 'postgres',
+        'HOST': 'db',
+        'PORT': 5432,
     }
 }
 ...
 ```
 
-If your containers are still running, Django should have picked up that change and have reloaded. The `api` service now uses the the containerized posgreSQL database.
+If your containers are still running, Django should have picked up that change and have reloaded.
 
-## 2) Modify the User model
+The `api` service now uses the the dockerized posgreSQL database.
+
+## 2) Modify the User model to implement email login
 
 We are going to implement email login as this is more convinient for users than username.
 
-First, we create a `users` app. For this we shutdown our containers using the following command.
-
-```bash
-docker-compose down
-```
-
-Then, run the following command to create the `users` app:
+For this, we create a `users` app using the following command.
 
 ```bash
 docker-compose run api python manage.py startapp users
 ```
 
-We now can do the following changes to implement email login.
+We do the following changes to implement email login.
 
-```bash
-touch api/users/forms.py
-```
+We start by overiding Django's user model and create our own.
 
 ```python
 ### api/users/models.py
-from django.contrib.auth.base_user import AbstractBaseUser
 from django.db import models
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractUser
@@ -195,6 +187,12 @@ class CustomUser(AbstractUser):
         return self.email
 ```
 
+Then, we create custom forms to overide Django's.
+
+```bash
+touch api/users/forms.py
+```
+
 ```python
 ### api/users/forms.py
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
@@ -212,6 +210,8 @@ class CustomUserChangeForm(UserChangeForm):
         model = CustomUser
         fields = ('email',)
 ```
+
+We also, modify `admin.py` so our user model is easily accessible from the admin page.
 
 ```python
 ### api/users/admin.py
@@ -244,6 +244,8 @@ class CustomUserAdmin(UserAdmin):
 admin.site.register(CustomUser, CustomUserAdmin)
 ```
 
+Finaly, we register our user app in our installed app and point `AUTH_USER_MODEL` to our new custom user model.
+
 ```python
 ### api/_project/settings.py
 ...
@@ -262,28 +264,34 @@ AUTH_USER_MODEL = 'users.CustomUser'
 ...
 ```
 
-We then migrate our database for our changes to take effect. We also create a superuser to check our changes in the admin page:
+For our change to take effect, we need to migrate our database. We do this using the following 2 commands.
 
 ```bash
 docker-compose run api python manage.py makemigrations users
 docker-compose run api python manage.py migrate
+```
+
+Then, we create our superuser to be able to access the admin page.
+
+```bash
 docker-compose run api python manage.py createsuperuser
 ```
 
-Finally we spin up our docker containers.
+Finally we spin up our docker containers using docker-compose.
 
 ```bash
 docker-compose up
 ```
 
-We should now be able to login to the admin page using email instead of username!
-We also can create, modify and delete users from the admin page (http://localhost:8000/admin/).
+We should now be able to login to the admin page (http://localhost:8000/admin) using email instead of username!
 
-## 3) JWT authentication
+<div><blog-img src="django_admin_email_login.png" alt="Django admin email login" width="100%" height="auto" class="shadow mb-3"/></div>
+
+We also can create, modify and delete users from the admin page (http://localhost:8000/admin/users/).
+
+## 3) Setting up JWT authentication
 
 For authentication, we will use the `djangorestframework-simplejwt` library. This library provide out of the box JWT authentication.
-
-We will also install the `djangorestframework` library.
 
 To do this, we just have to modify our `requirements.txt` file.
 
@@ -291,20 +299,15 @@ To do this, we just have to modify our `requirements.txt` file.
 ### requirements.txt
 Django==3.2
 psycopg2-binary==2.9.1
-djangorestframework==3.12.2
+djangorestframework==3.12.4
 djangorestframework-simplejwt==4.7.2
 ```
 
-Then, we can shut down our containers and rebuild our image using the `--build` option.
-
-```bash
-docker-compose down
-docker-compose up --build
-```
+Then, we need to rebuild our image. We can do this by using `docker-compose up --build`.
 
 The new dependencies have now been installed and our Django api is up and running again!
 
-To use `djangorestframework` and `dj-rest-auth`, add the following code to you `settings.py`.
+To use and configure `djangorestframework` and `djangorestframework-simplejwt`, we add the following code to you `settings.py`.
 
 ```python
 ### api/_project/settings.py
@@ -324,15 +327,13 @@ INSTALLED_APPS = [
     #3rd party
     'rest_framework',
 ]
-
-AUTH_USER_MODEL = 'users.CustomUser'
-
+...
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
     'ROTATE_REFRESH_TOKENS': True,
 }
-
+...
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
@@ -344,6 +345,8 @@ REST_FRAMEWORK = {
 }
 ...
 ```
+
+We also add `djangorestframework-simplejwt` routes to our project in order to get access token and request refresh token to our API.
 
 ```python
 ### api/_project/urls.py
@@ -362,20 +365,21 @@ urlpatterns = [
 
 ```
 
-Finally, we can migrate our database to apply our changes.
+We are now able to sign in user using JWT and refresh them so the user stays loggged in.
 
-```bash
-docker-compose run api python manage.py migrate
-```
+- Get access token: http://localhost:8000/token/
+- Refresh token: http://localhost:8000/token/refresh/
 
-We are now able to sign in user using JWT and refresh them so the user stays loggged in (http://localhost:8000/token/ and http://localhost:8000/token/refresh/)!
+<div><blog-img src="get_token_and_refresh_token.png" alt="Get token and refresh token API view" width="100%" height="auto" class="shadow mb-3"/></div>
 
-## 4) Signup, email and password change
+## 4) Setting signup, email change and password change
 
-Let's now create the basics for our user to access the app:
-- Signup new users
-- Access and change user's email email
-- Change user's password
+Let's now create some API view for our user to:
+- Signup
+- Access and change their email
+- Change their password
+
+We start by creating our serializers.
 
 ```bash
 touch api/users/serializers.py
@@ -442,6 +446,8 @@ class PasswordChangeSerializer(serializers.ModelSerializer):
         return instance
 ```
 
+Then, we create our view. Using djangorestframework's generics view make things extremely easy for us!
+
 ```python
 ### api/users/views.py
 from rest_framework import generics
@@ -469,6 +475,8 @@ class PasswordChange(generics.UpdateAPIView):
         return self.request.user
 ```
 
+Finally, we add the crreated view to our `urls.py`.
+
 ```python
 ### api/_project/urls.py
 from django.contrib import admin
@@ -489,15 +497,28 @@ urlpatterns = [
 ]
 ```
 
-That is it! Users are now able to signup, change their email and their password.
+Users are now able to signup at http://localhost:8000/signup/.
 
-## 5) Password reset
+<div><blog-img src="signup.png" alt="Signup API view" width="100%" height="auto" class="shadow mb-3"/></div>
 
-For our user to properly use our app, one more feature is nice (if not mandatory) to have. Password reset.
 
-Password reset is pretty hard to implement. Fortunately, the `django-rest-passwordreset` library makes such implementation a breeze.
+Change their email at http://localhost:8000/user/.
 
-To use this library, will need to implement sending email as well. I will use a gmail account for this. However, steps are similar for all email providers
+<div><blog-img src="email_change.png" alt="Email change API view" width="100%" height="auto" class="shadow mb-3"/></div>
+
+And change their password at http://localhost:8000/password/change/.
+
+<div><blog-img src="password_change.png" alt="Password change API view" width="100%" height="auto" class="shadow mb-3"/></div>
+
+## 5) Setting up Password reset by email
+
+For our user to properly use our app, one more feature is nice (if not mandatory) to have. Password reset by email.
+
+Password reset is pretty hard to implement by our own. Fortunately, the `django-rest-passwordreset` library makes such implementation a breeze.
+
+To use this library, will need to implement sending email as well. I will use a gmail account for this. However, steps are similar for all email providers.
+
+We start by installing `django-rest-passwordreset` by adding it into our `requirements.txt`.
 
 ```txt
 ### api/requirements.txt
@@ -508,21 +529,7 @@ djangorestframework-simplejwt==4.7.2
 django-rest-passwordreset==1.2.0
 ```
 
-```txt
-### .env
-POSTGRES_DB=postgres
-POSTGRES_USER=postgres
-POSTGRES_PASSWORD=postgres
-POSTGRES_HOST=db
-POSTGRES_PORT=5432
-
-EMAIL_HOST=smtp.gmail.com
-EMAIL_HOST_USER=<Your email here>
-EMAIL_HOST_PASSWORD=<Your password here>
-EMAIL_PORT=587
-DEFAULT_FROM_EMAIL=<Your email here>
-FRONTEND_URL=http://localhost:3000
-```
+We add `django_rest_passwordreset` and setup our email provider in our `settings.py`. 
 
 ```python
 ### api/_project/settings.py
@@ -544,13 +551,15 @@ INSTALLED_APPS = [
 ...
 EMAIL_BACKENDS = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER =  os.environ.get("EMAIL_HOST_USER"),
-EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD"),
-EMAIL_PORT = 587
+EMAIL_HOST_USER = <Your email here>,
+EMAIL_HOST_PASSWORD = <Your password here>,
+EMAIL_PORT = 587 #for gmail only
 EMAIL_USE_TLS = True
-DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL"),
+DEFAULT_FROM_EMAIL = <Your email here>,
 ...
 ```
+
+We also add `django-rest-passwordreset` view to our `urls.py` file.
 
 ```python
 ### api/_project.urls.py
@@ -573,7 +582,9 @@ urlpatterns = [
 ]
 ```
 
-We now create a signal to send email to user
+By default, `django-rest-passwordreset` will not send email to user. We are going to use a signal for this.
+
+First, we can start by creating a the template of the email sent to our users. In these template, we will inject the user's email as well as the password reset url.
 
 ```bash
 touch api/users/templates/email/user_reset_password.html
@@ -619,6 +630,8 @@ Regards
 Awesome Recipes
 ```
 
+Inside our `users/models.py`, will create a function to send the eamail to the users that will be fired everytime a password reset token is created.
+
 ```python
 ### api/users/models.py
 from django.db import models
@@ -627,15 +640,13 @@ from django.contrib.auth.models import AbstractUser
 from django.core.mail import EmailMultiAlternatives
 from django.dispatch import receiver
 from django.template.loader import render_to_string
-from django.urls import reverse
 from django_rest_passwordreset.signals import reset_password_token_created
 ...
 @receiver(reset_password_token_created)
 def password_reset_token_created(sender, instance, reset_password_token, *args, **kwargs):
-    url = os.environ.get("FRONTEND_URL")
     context = {
         'email': reset_password_token.user.email,
-        'reset_password_url': f"{url}/password/reset/confirm/?token={reset_password_token.key}"
+        'reset_password_url': f"http://localhost:3000/password/reset/confirm/?token={reset_password_token.key}"
     }
     email_html_message = render_to_string('email/user_reset_password.html', context)
     email_plaintext_message = render_to_string('email/user_reset_password.txt', context)
@@ -651,7 +662,25 @@ docker-compose build api
 docker-compose run api python manage.py migrate
 ```
 
-Email reset is now implemented! We now can spin up our containers and try it out (http://localhost:8000/password/reset/, http://localhost:8000/password/reset/verify_token/ and http://localhost:8000/password/reset/confirm/)!
+Password reset is now implemented!
+
+We now can spin up our containers and try it out!
+
+```bash
+docker-compose up
+```
+
+We can request password reset to http://localhost:8000/password/reset/
+
+<div><blog-img src="password_reset_request.png" alt="Password reset request API view" width="100%" height="auto" class="shadow mb-3"/></div>
+
+Verify token validity to http://localhost:8000/password/reset/verify_token/
+
+<div><blog-img src="password_reset_verify.png" alt="Password reset verify API view" width="100%" height="auto" class="shadow mb-3"/></div>
+
+And reset password to http://localhost:8000/password/reset/confirm/
+
+<div><blog-img src="password_reset_confirm.png" alt="Password reset confirm API view" width="100%" height="auto" class="shadow mb-3"/></div>
 
 ## 6) Create recipes API views
 
@@ -663,11 +692,7 @@ First, we create the `recipes` app.
 docker-compose run api python manage.py startapp recipes
 ```
 
-Then we add the folowing content to create our views.
-
-```bash
-touch api/recipes/serializers.py
-```
+Then we create the following models.
 
 ```python
 ### api/recipes/models.py
@@ -687,6 +712,8 @@ class Recipe(models.Model):
         return self.name
 ```
 
+We also edit `admin.py` to be able to manage this recipe model from the admin page.
+
 ```python
 ### api/recipes/admin.py
 from django.contrib import admin
@@ -696,6 +723,12 @@ from .models import Recipe
 @admin.register(Recipe)
 class RecipeAdmin(admin.ModelAdmin):
     list_display = ['id', 'name', 'created_at', 'updated_at',]
+```
+
+We create the serializers.
+
+```bash
+touch api/recipes/serializers.py
 ```
 
 ```python
@@ -721,6 +754,8 @@ class RecipeSerializer(serializers.ModelSerializer):
         validated_data['user'] = self.context['request'].user
         return Recipe.objects.create(**validated_data)
 ```
+
+And then the views.
 
 ```python
 ### api/recipes/views.py
@@ -748,6 +783,8 @@ class RecipeDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = RecipeSerializer
 ```
 
+Finally, we add the views to our `urls.py`. Here, we also add a static route to serve our media files that are uploaded by users.
+
 ```python
 ### api/_project/urls.py
 from django.contrib import admin
@@ -774,6 +811,8 @@ urlpatterns = [
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 ```
 
+We also need to add this new app to our installed app. We also setup our `MEDIA_URL` and `MEDIA_ROOT` to serve our media files.
+
 ```python
 ### api/_project/settings.py
 ...
@@ -795,24 +834,6 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_rest_passwordreset',
 ]
-
-AUTH_USER_MODEL = 'users.CustomUser'
-
-SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
-    'ROTATE_REFRESH_TOKENS': True,
-}
-
-REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
-    ],
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.SessionAuthentication',
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-    ],
-}
 ...
 MEDIA_URL = '/api/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR.parent, 'media').replace('\\', '/')
@@ -825,9 +846,9 @@ However, on image edit or deletion, the image will remain in the `media` folder.
 
 Fortunately, we can install the `django_cleanup` library. This library will delete media files on instance modification and deletion using Django signals.
 
-We also need to install `Pillow` library to use Django `ImageField`.
+We also need to install the `Pillow` library to use Django `ImageField` in our recipe model.
 
-Finally, we need to install `django-cors-headers` as our frontend will not be served using the same host as the Django API (at least during development).
+Finally, we need to install `django-cors-headers` as our frontend will not be served using the same host as the Django API.
 
 ```txt
 ### api/requirements.txt
@@ -838,22 +859,6 @@ djangorestframework-simplejwt==4.7.2
 django-cleanup==5.2.0
 Pillow==8.3.1
 django-cors-headers==3.8.0
-```
-
-```txt
-### .env
-POSTGRES_DB=postgres
-POSTGRES_USER=postgres
-POSTGRES_PASSWORD=postgres
-POSTGRES_HOST=db
-POSTGRES_PORT=5432
-
-EMAIL_HOST=smtp.gmail.com
-EMAIL_HOST_USER=<Your email here>
-EMAIL_HOST_PASSWORD=<Your password here>
-EMAIL_PORT=587
-DEFAULT_FROM_EMAIL=<Your email here>
-FRONTEND_URL=http://localhost:3000
 ```
 
 We also need to modify our `settings.py` to include these library
@@ -890,7 +895,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 ...
-CORS_ALLOWED_ORIGINS = [os.environ.get("FRONTEND_URL")]
+CORS_ALLOWED_ORIGINS = ['http://localhost:3000']
 ...
 ```
 
@@ -906,11 +911,13 @@ version: "3.9"
 
 services:
   db:
-    image: postgres
+    image: postgres:13.4
     volumes:
       - ./db:/var/lib/postgresql/data
-    env_file:
-      - .env
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
   api:
     restart: always
     build:
@@ -924,8 +931,6 @@ services:
       - "8000:8000"
     depends_on:
       - db
-    env_file:
-      - .env
 ```
 
 We now rebuild our image and migrate our database for our change to take effect:
@@ -942,31 +947,20 @@ And spin up our containers:
 docker-compose up
 ```
 
-We can now create, modify and delete recipes!
+We can now create to http://localhost:8000/recipes/
 
-## 7) Final modifications
+<div><blog-img src="recipes_create.png" alt="Create recipe API view" width="100%" height="auto" class="shadow mb-3"/></div>
 
-By default, `ALLOWED_HOSTS` is set to an empty array. That allow the app to be serve from `localhost:8000`.
+Modify and delete existing recipes to http://localhost:8000/recipes/id/
 
-However, in [Part 2](https://blog.florianbgt.com/Universal_PWA_SSR_Nuxt_Django_docker_AWS_Part2_Nuxt_frontend) of this tutorial, we are going to setup a Nuxt app with server side rendering. For the server side rendering API call, we are going to establish a direct connection from container to container using a docker network.
-
-Our django host is not going to be serve from `localhost:8000` anymore but from `api`.
-
-Let include it in our `settings.py`.
-
-```python
-### api/_project/settings.py
-...
-ALLOWED_HOSTS = ['localhost', 'api']
-...
-```
+<div><blog-img src="recipes_modify.png" alt="Modify and delete recipe API view" width="100%" height="auto" class="shadow mb-3"/></div>
 
 ## Conclusion
 
-Our API is now setup!
+Our REST API is now setup!
 
-In the [Part 2](https://blog.florianbgt.com/Universal_PWA_SSR_Nuxt_Django_docker_AWS_Part2_Nuxt_frontend) of this tutorial, we will see how to set up our frontend using Nuxt.
+In the [Part 2](https://blog.florianbgt.com/Nuxt_Django_REST_Docker_Part2) of this tutorial, we will see how to set up our frontend using Nuxt.
 
-You can find the source code of this article on my github: https://github.com/florianbgt/Universal_PWA_SSR_Nuxt_Django_Docker_AWS
+You can find the source code of this article on [my github](https://github.com/florianbgt/Nuxt-Django-REST-Docker)
 
 If you have any question or just want to chat, feel free to email me florian.bigot321@gmail.com

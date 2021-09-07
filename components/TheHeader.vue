@@ -43,7 +43,7 @@ export default {
     data() {
         return{
             routes: [
-                {name: 'Home', path: '/'}
+                {name: 'All Articles', path: '/'}
             ]
         }
     }

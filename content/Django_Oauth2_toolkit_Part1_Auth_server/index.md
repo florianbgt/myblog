@@ -11,9 +11,9 @@ This server will be a REST API usable by other services for authentication using
 
 This is the part 1 of the tutorial where we will setup the authentication server
 
-Part 2 here: https://blog.florianbgt.com/Django_Oauth2_toolkit_Part2_Resource_server
+[Part 2 here](https://blog.florianbgt.com/Django_Oauth2_toolkit_Part2_Resource_server)
 
-You can find the source code on my github: https://github.com/florianbgt/django-rest-oauth2-authserver
+You can find the source code on [my github](https://github.com/florianbgt/django-rest-oauth2-authserver)
 
 ## 1) Setting up our project
 
@@ -197,7 +197,7 @@ In the admin, we should also see our `CustomUser` display correctly:
 
 ## 2) Setting up Oauth2 using Django Oauth Toolkit
 
-To setup Oauth2, we are going to use the Django Oauth Toolkit library (https://django-oauth-toolkit.readthedocs.io/en/latest/)
+To setup Oauth2, we are going to use the Django Oauth Toolkit library
 
 First, we start by installing the library. We also install django rest framework to create extra API endpoints that will be usefull in the Part 2 of this article:
 
@@ -205,7 +205,7 @@ First, we start by installing the library. We also install django rest framework
 pip install djangorestframework django-oauth-toolkit
 ```
 
-We then configure Django rest framework and Django Oauth Tookit according to Oauth Toolkit documentation (https://django-oauth-toolkit.readthedocs.io/en/latest/rest-framework/getting_started.html#step-1-minimal-setup).  
+We then configure Django rest framework and Django Oauth Tookit according to [Oauth Toolkit documentation](https://django-oauth-toolkit.readthedocs.io/en/latest/rest-framework/getting_started.html#step-1-minimal-setup).  
 I will also include session authentication for the admin  
 Finally, I include the `introspection` scope. This scope will be used by the resource server we will setup in Part 2 of this article
 
@@ -424,8 +424,8 @@ Finally, we can change the password of this new user. Here, we need to attached 
 
 We now have our Oauth server setup!
 
-In the part 2 of this tutorial (https://blog.florianbgt.com/Django_Oauth2_toolkit_Part2_Resource_server) we will see how to setup a separate resource server that use this Oauth2 API for authentication
+In the [part 2 of this tutorial ](https://blog.florianbgt.com/Django_Oauth2_toolkit_Part2_Resource_server) we will see how to setup a separate resource server that use this Oauth2 API for authentication
 
-You can find the source code of this article on my github: https://github.com/florianbgt/django-rest-oauth2-authserver
+You can find the source code of this article on [my github](https://github.com/florianbgt/django-rest-oauth2-authserver)
 
 If you have any question or just want to chat, feel free to email me florian.bigot321@gmail.com

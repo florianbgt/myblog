@@ -9,7 +9,7 @@ I love Django and I use it as a backend for most of my projects. However, it use
 
 Email authentication would be much better right? Fortunately, there is a easy solution, [Django Allauth](https://django-allauth.readthedocs.io)
 
-You can find the final source code on my Github: https://github.com/florianbgt/django-allauth
+You can find the final source code on [my Github](https://github.com/florianbgt/django-allauth)
 
 ## 1) Setting up the project
 
@@ -41,8 +41,7 @@ If you visit [http://localhost:8000](http://localhost:8000) you should see our d
 
 Changing the user model inside a on going project can be very difficult.
 
-That is why Django's documentation highly recommends to setup a custom user model at the beginning of a project.
-https://docs.djangoproject.com/en/3.2/topics/auth/customizing/#using-a-custom-user-model-when-starting-a-project
+That is why [Django's documentation](https://docs.djangoproject.com/en/3.2/topics/auth/customizing/#using-a-custom-user-model-when-starting-a-project) highly recommends to setup a custom user model at the beginning of a project.
 
 It saves a lot of time later on if we ever have to modify that user model.
 
@@ -542,6 +541,6 @@ https://github.com/pennersr/django-allauth/tree/master/allauth/templates/account
 
 As you can see, Django Allauth makes email authentication super easy for us! Templates are also relatively easy to customize as well.
 
-You can find the complete source code of the python project on my github https://github.com/florianbgt/django-allauth
+You can find the complete source code of the python project on [my github](https://github.com/florianbgt/django-allauth)
 
 If you have any question or just want to chat, feel free to email me <a href="mailto:florian.bigot321@gmail.com">florian.bigot321@gmail.com</a>

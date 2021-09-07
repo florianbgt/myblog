@@ -11,9 +11,9 @@ This server will be a REST API usable by other services for authentication using
 
 This is the part 2 of the tutorial where we will setup the resource server
 
-Part 1 here: https://blog.florianbgt.com/Django_Oauth2_toolkit_Part1_Auth_server
+[Part 1 here](https://blog.florianbgt.com/Django_Oauth2_toolkit_Part1_Auth_server)
 
-You can find the source code on my github: https://github.com/florianbgt/django-rest-oauth2-resourceserver
+You can find the source code on [my github](https://github.com/florianbgt/django-rest-oauth2-resourceserver)
 
 ## 1) Setting up our project
 
@@ -181,7 +181,7 @@ Password (again): testpass123
 
 ## 2) Setting up Oauth2 using Django Oauth Toolkit
 
-The setup is going to be similar to the authentication server ([Part1](https://blog.florianbgt.com/Django_Oauth2_toolkit_Part1_Auth_server) of this article).
+The setup is going to be similar to the authentication server ([see Part1](https://blog.florianbgt.com/Django_Oauth2_toolkit_Part1_Auth_server)).
 
 ```bash
 pip install djangorestframework django-oauth-toolkit
@@ -562,6 +562,6 @@ We have now have a separate Oauth2 resource server setup!
 
 We can create many other resource server using this setup while having one centralized authentication server which create a great user experience
 
-You can find the source code of this article on my github: https://github.com/florianbgt/django-rest-oauth2-resourceserver
+You can find the source code of this article on [my github](https://github.com/florianbgt/django-rest-oauth2-resourceserver)
 
 If you have any question or just want to chat, feel free to email me florian.bigot321@gmail.com

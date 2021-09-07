@@ -13,7 +13,7 @@ Nuxt content allow you to to fetch and use Markdown, JSON, YAML, CSV and XML fil
 
 In this article, we will built a blog using Nuxt content and Markdown files.
 
-You can find the final source code on my github https://github.com/florianbgt/nuxt-content-blog
+You can find the final source code on [my github](https://github.com/florianbgt/nuxt-content-blog)
 
 ## 1) Setting up our Nuxt project
 
@@ -407,6 +407,6 @@ For deployment, just run the following command and you will end up with a static
 npm run generate
 ```
 
-You can find the complete source code on my github https://github.com/florianbgt/nuxt-content-blog
+You can find the complete source code on [my github](https://github.com/florianbgt/nuxt-content-blog)
 
 If you have any question or just want to chat, feel free to email me <a href="mailto:florian.bigot321@gmail.com">florian.bigot321@gmail.com</a>

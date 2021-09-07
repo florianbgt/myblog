@@ -8,10 +8,16 @@
                 <small>
                     <i>
                         <fa :icon="['fas', 'user']" style="font-size: 20px"/>
+                        By
                         {{article.writtenBy}}
                         -
                         <fa :icon="['far', 'calendar-alt']" style="font-size: 20px"/>
+                        Created 
                         {{ new Date(article.createdAt).toLocaleDateString('en', { year: 'numeric', month: 'long', day: 'numeric' }) }}
+                        -
+                        <fa :icon="['far', 'calendar-alt']" style="font-size: 20px"/>
+                        Last updated 
+                        {{ new Date(article.updatedAt).toLocaleDateString('en', { year: 'numeric', month: 'long', day: 'numeric' }) }}
                     </i>
                 </small>
             </h4>
