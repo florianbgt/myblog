@@ -339,7 +339,6 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.SessionAuthentication',
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
 }
@@ -551,11 +550,11 @@ INSTALLED_APPS = [
 ...
 EMAIL_BACKENDS = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = <Your email here>,
-EMAIL_HOST_PASSWORD = <Your password here>,
+EMAIL_HOST_USER = <Your email here>
+EMAIL_HOST_PASSWORD = <Your password here>
 EMAIL_PORT = 587 #for gmail only
 EMAIL_USE_TLS = True
-DEFAULT_FROM_EMAIL = <Your email here>,
+DEFAULT_FROM_EMAIL = <Your email here>
 ...
 ```
 
@@ -848,6 +847,8 @@ Fortunately, we can install the `django_cleanup` library. This library will dele
 
 We also need to install the `Pillow` library to use Django `ImageField` in our recipe model.
 
+Our API will be hosted from 2 different host. From `localhost` externaly and from `api` whitin docker. We need to add these two host to the `ALLOWED_HOSTS`.
+
 Finally, we need to install `django-cors-headers` as our frontend will not be served using the same host as the Django API.
 
 ```txt
@@ -866,6 +867,8 @@ We also need to modify our `settings.py` to include these library
 ```python
 ### api/_project/settings.py
 ...
+ALLOWED_HOSTS = ['localhost', 'api']
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
