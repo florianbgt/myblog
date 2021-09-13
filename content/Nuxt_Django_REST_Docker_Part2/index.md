@@ -9,7 +9,7 @@ In this tutorial, we will setup a dockerized Nuxt app with PWA and SSR capabilit
 
 This is the part 1 of the tutorial where we will setup the Nuxt frontend with PWA and SSR capabilities
 
-Part 1 here: https://blog.florianbgt.com/Nuxt_Django_REST_Docker_Part1
+[Part 1 here](https://blog.florianbgt.com/Nuxt_Django_REST_Docker_Part1)
 
 You can find the source code of this article on [my github](https://github.com/florianbgt/Nuxt-Django-REST-Docker)
 
