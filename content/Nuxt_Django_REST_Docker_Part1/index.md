@@ -50,7 +50,7 @@ RUN pip install -r requirements.txt
 COPY . .
 ```
 
-`docker-compose.yml` will be use during our developement to orchestrate our containers.
+`docker-compose.yml` will be use during our development to orchestrate our containers.
 For now, we are going to use 2 containers:
 - A postgreSQL database (official image from Docker hub)
 - Our custom API image
@@ -100,7 +100,7 @@ If we go to http://localhost:8000/, we should see our Django app up and running:
 
 <div><blog-img src="django_success.png" alt="Django landing page" width="100%" height="auto" class="shadow mb-3"/></div>
 
-Currently, our app is using the default `sqlite` database Django provides. We could use this database for developement. However, I like to use a postgreSQL database during developement to mimic our production environement as much as possible and avoid potential headache later on.
+Currently, our app is using the default `sqlite` database Django provides. We could use this database for development. However, I like to use a postgreSQL database during development to mimic our production environement as much as possible and avoid potential headache later on.
 
 Thanksfully, the official `postgresql` docker image make things extrimely easy for us!
 

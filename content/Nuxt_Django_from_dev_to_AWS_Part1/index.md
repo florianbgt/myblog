@@ -1,5 +1,5 @@
 ---
-title: Nuxt Django app from developement to AWS - Part 1
+title: Nuxt Django app from development to AWS - Part 1
 description: Deploy a Django Nuxt application to AWS using RDS, S3 and ECS services. Part 1, prepare the app for production using RDS, S3 and traefik
 image: "aws.png"
 writtenBy: "Florian Bigot"
